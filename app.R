@@ -37,12 +37,14 @@ server <- function(input, output){
   ##############################################################
   #
   # COMPLETED:
-  #   - ADD A selectInput() BOX TO ALLOW USER TO CHOOSE DIFFERENT TRICKS AND UPDATE DB ACCORDINGLY  
+  #   - ADDED A selectInput() BOX TO ALLOW USER TO CHOOSE DIFFERENT TRICKS AND UPDATE DB ACCORDINGLY  
+  #   - ADDED FUNCTION TO DISCONNECT FROM THE DATABASE UPON CLOSING THE APP (BRIEFLY TESTED, I THINK IT'S WORKING PROPERLY)
   #
   ##############################################################  
   #
   #  NEXT STEPS:
-  #   - NEED TO FIGURE OUT HOW TO DISCONNECT FROM DB AFTER EACH SESSION
+  #   - BEGIN TRACKING session_id AND UPDATE DB ACCORDINGLY
+  #   - NEED TO RESET attempt_nbr AND make/miss UPON CHANGING THE TRICK
   #   - HOST THE APP ON A WEB SERVER
   #
   ##############################################################  
@@ -81,6 +83,11 @@ server <- function(input, output){
     query <- dbSendQuery(con, sql)
   })
 }
+
+# disconnect from the DB upon closing
+onStop(function(){
+  dbDisconnect(con)
+  })
 
 # run the app
 shinyApp(ui = ui, server = server)
