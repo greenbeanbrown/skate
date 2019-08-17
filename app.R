@@ -9,6 +9,12 @@ con <- dbConnect(MySQL(),
 
 ui <- fluidPage(
   
+  # trick dropdown menu
+  selectInput(inputId = 'trick',
+              label = 'Select your trick',
+              c('Ollie', 'Kickflip','Heelflip','FS 180','BS 180','Boardslide','50-50')
+  ),
+  
   # make button
   actionButton(inputId = 'make',
                label = 'Make',
@@ -31,16 +37,12 @@ server <- function(input, output){
   ##############################################################
   #
   # COMPLETED:
-  #   - CREATED A LOGGING SYSTEM FOR TRACKING DATA
-  #     -CREATED A DATABASE (MYSQL)
-  #     - CONNECTED SERVER.R SCRIPT TO THE DB 
-  #     - CREATED REACTIVE FUNCTIONS THAT DYNAMICALLY UPDATE THE DB 
+  #   - ADD A selectInput() BOX TO ALLOW USER TO CHOOSE DIFFERENT TRICKS AND UPDATE DB ACCORDINGLY  
   #
   ##############################################################  
   #
   #  NEXT STEPS:
-  #   - ADD A selectInput() BOX TO ALLOW USER TO CHOOSE DIFFERENT TRICKS AND UPDATE DB ACCORDINGLY  
-  #   - NEED TO RESEARCH IF DISCONNECTING FROM THE DB IS NECESSARY AND IMPLEMENT IF NEED BE
+  #   - NEED TO FIGURE OUT HOW TO DISCONNECT FROM DB AFTER EACH SESSION
   #   - HOST THE APP ON A WEB SERVER
   #
   ##############################################################  
@@ -60,23 +62,22 @@ server <- function(input, output){
   ##############################################################  
   
   # track the number of makes, misses, total attempts
+  output$trick <- renderText( { input$trick })
   output$make <- renderText( { input$make })
   output$miss <- renderText( { input$miss })
-  output$total <- renderText( { input$make + input$miss })
-  
-  # INSERTING DATA INTO THE DATABASE
+  output$total <- renderText( { input$make + input$miss})
   
   # make 
   observeEvent(input$make, {
     # upon clicking the make button, send an insert query with the made attempt
-    sql = paste0('INSERT INTO skate.skate ( date, time, trick, attempt_nbr, make, miss) VALUES (curdate(), curtime(), \'kickflip\', ',(input$make + input$miss),', ',input$make,', ',input$miss,')')
+    sql = paste0('INSERT INTO skate.skate ( date, time, trick, attempt_nbr, make, miss) VALUES (curdate(), curtime(), \'',input$trick, '\',',(input$make + input$miss),', ',input$make,', ',input$miss,')')
     query <- dbSendQuery(con, sql)
   })
   
   # miss
   observeEvent(input$miss, {
     # upon clicking the make button, send an insert query with the missed attempt
-    sql = paste0('INSERT INTO skate.skate ( date, time, trick, attempt_nbr, make, miss) VALUES (curdate(), curtime(), \'kickflip\', ',(input$make + input$miss),', ',input$make,', ',input$miss,')')
+    sql = paste0('INSERT INTO skate.skate ( date, time, trick, attempt_nbr, make, miss) VALUES (curdate(), curtime(), \'',input$trick, '\',',(input$make + input$miss),', ',input$make,', ',input$miss,')')
     query <- dbSendQuery(con, sql)
   })
 }
